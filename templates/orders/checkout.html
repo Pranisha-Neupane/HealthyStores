@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <h1 class="mb-4"><i class="bi bi-credit-card text-success me-2"></i>Checkout</h1>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-4">
+                <!-- Customer details -->
+                <div class="col-lg-7">
+                    <div class="card food-card p-4">
+                        <h5 class="mb-3">Delivery Details</h5>
+                        {{ form.non_field_errors }}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>{{ form.full_name }}{{ form.full_name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>{{ form.email }}{{ form.email.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>{{ form.phone }}{{ form.phone.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Delivery Address</label>{{ form.address }}{{ form.address.errors }}
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4 mb-3">Payment Method</h5>
+                        <div class="d-flex flex-column gap-2">
+                            {% for radio in form.payment_method %}
+                            <label class="border rounded-3 p-3 d-flex align-items-center gap-3 bg-white" style="cursor:pointer">
+                                {{ radio.tag }}
+                                <span class="fw-semibold">
+                                    {% if radio.choice_value == 'COD' %}💵 {% elif radio.choice_value == 'ESEWA' %}🟢 {% else %}🟣 {% endif %}
+                                    {{ radio.choice_label }}
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <p class="small text-muted mt-2 mb-0">eSewa / Khalti: our rider will share a payment QR on delivery confirmation.</p>
+                    </div>
+                </div>
+
+                <!-- Order summary -->
+                <div class="col-lg-5">
+                    <div class="card food-card p-4">
+                        <h5 class="mb-3">Order Summary</h5>
+                        {% for row in cart %}
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span>{{ row.quantity }} × {{ row.product.name }}</span>
+                            <span>Rs. {{ row.total|floatformat:0 }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-1"><span>Subtotal</span><span>Rs. {{ cart.subtotal|floatformat:2 }}</span></div>
+                        <div class="d-flex justify-content-between mb-1"><span>Tax (13% VAT)</span><span>Rs. {{ cart.tax|floatformat:2 }}</span></div>
+                        <div class="d-flex justify-content-between mb-1"><span>Delivery</span><span>{% if cart.delivery == 0 %}FREE{% else %}Rs. {{ cart.delivery|floatformat:2 }}{% endif %}</span></div>
+                        {% if promo %}
+                        <div class="d-flex justify-content-between mb-1 text-success"><span>Promo ({{ promo.code }})</span><span>− Rs. {{ discount|floatformat:2 }}</span></div>
+                        {% endif %}
+                        <hr>
+                        <div class="d-flex justify-content-between fs-5 fw-bold mb-3"><span>Grand Total</span><span class="text-success">Rs. {{ grand_total|floatformat:2 }}</span></div>
+                        <button class="btn btn-order w-100 btn-lg" type="submit"><i class="bi bi-bag-check me-1"></i>Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

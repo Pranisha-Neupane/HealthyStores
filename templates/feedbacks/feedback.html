@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Feedback{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-label">Reviews</span>
+            <h1>Customer Feedback</h1>
+            {% if review_count %}
+            <p class="text-muted">
+                <span class="star-filled fs-4">★</span>
+                <strong>{{ avg_rating }}</strong> average from {{ review_count }} review{{ review_count|pluralize }}
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="row g-5">
+            <!-- Submit feedback -->
+            <div class="col-lg-5">
+                <div class="card food-card p-4">
+                    <h5 class="mb-3">Share Your Experience</h5>
+                    {% if user.is_authenticated %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <label class="form-label">Your Rating</label>
+                        <!-- 5-star selector (CSS-only, reversed row) -->
+                        <div class="star-input mb-3">
+                            {% for i in "54321" %}
+                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if i == "5" %}checked{% endif %}>
+                            <label for="star{{ i }}" title="{{ i }} stars">★</label>
+                            {% endfor %}
+                        </div>
+                        <label class="form-label">Your Review</label>
+                        {{ form.comment }}
+                        <button class="btn btn-order mt-3" type="submit"><i class="bi bi-send me-1"></i>Submit Review</button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted">Please log in to leave a review.</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-order">Login to Review</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Review list -->
+            <div class="col-lg-7">
+                {% for review in reviews %}
+                <div class="card food-card p-4 mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                            <div>
+                                {% for _ in review.stars %}<span class="star-filled">★</span>{% endfor %}
+                                {% for _ in review.empty_stars %}<span class="star-empty">★</span>{% endfor %}
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <p class="mb-0 mt-2">{{ review.comment }}</p>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-5">
+                    <div style="font-size:3rem">💬</div>
+                    <p>No reviews yet — be the first to share your experience!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

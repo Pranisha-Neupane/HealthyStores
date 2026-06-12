@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container" style="max-width:860px">
+        <h1 class="mb-4"><i class="bi bi-person-circle text-success me-2"></i>My Profile</h1>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card food-card p-4">
+                    <h5 class="mb-3">Personal Details</h5>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6"><label class="form-label">First Name</label>{{ form.first_name }}</div>
+                            <div class="col-md-6"><label class="form-label">Last Name</label>{{ form.last_name }}</div>
+                            <div class="col-md-6"><label class="form-label">Email</label>{{ form.email }}</div>
+                            <div class="col-md-6"><label class="form-label">Phone</label>{{ form.phone }}</div>
+                            <div class="col-12"><label class="form-label">Address</label>{{ form.address }}</div>
+                        </div>
+                        <button class="btn btn-order mt-3" type="submit">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <!-- Loyalty progress -->
+                <div class="card food-card p-4 mb-4">
+                    <h5 class="mb-2">🎁 Loyalty Progress</h5>
+                    <p class="small text-muted mb-2">Total orders: <strong>{{ user.profile.total_orders }}</strong></p>
+                    <div class="progress mb-2" role="progressbar" style="height:10px">
+                        <div class="progress-bar bg-success" style="width:{{ loyalty_percent }}%"></div>
+                    </div>
+                    <small class="text-muted">{{ orders_to_reward }} more order{{ orders_to_reward|pluralize }} until your next 15% promo code!</small>
+                </div>
+                <!-- Available promo codes -->
+                <div class="card food-card p-4">
+                    <h5 class="mb-3">My Promo Codes</h5>
+                    {% for promo in promo_codes %}
+                    <div class="border border-success border-dashed rounded-3 p-2 mb-2 d-flex justify-content-between align-items-center bg-white">
+                        <strong>{{ promo.code }}</strong>
+                        <span class="nutri-pill">{{ promo.discount_percent }}% off</span>
+                    </div>
+                    {% empty %}
+                    <p class="small text-muted mb-0">No active promo codes yet — keep ordering to earn rewards!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

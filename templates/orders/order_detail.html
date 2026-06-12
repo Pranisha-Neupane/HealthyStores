@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.id }}{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container" style="max-width:760px">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Order #{{ order.id }}</h2>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div class="card food-card p-4">
+            <div class="row g-4 mb-3">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Delivery To</h6>
+                    <p class="mb-0"><strong>{{ order.full_name }}</strong><br>{{ order.address }}<br>{{ order.phone }} · {{ order.email }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6 class="text-muted">Details</h6>
+                    <p class="mb-0">{{ order.created_at|date:"M d, Y · g:i A" }}<br>Payment: {{ order.get_payment_method_display }}</p>
+                </div>
+            </div>
+            <table class="table">
+                <thead><tr class="small text-muted"><th>Item</th><th class="text-center">Qty</th><th class="text-end">Price</th><th class="text-end">Total</th></tr></thead>
+                <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end">Rs. {{ item.price|floatformat:0 }}</td>
+                    <td class="text-end">Rs. {{ item.total|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="ms-auto" style="max-width:300px; width:100%">
+                <div class="d-flex justify-content-between"><span>Subtotal</span><span>Rs. {{ order.subtotal|floatformat:2 }}</span></div>
+                <div class="d-flex justify-content-between"><span>Tax</span><span>Rs. {{ order.tax|floatformat:2 }}</span></div>
+                <div class="d-flex justify-content-between"><span>Delivery</span><span>Rs. {{ order.delivery_charge|floatformat:2 }}</span></div>
+                {% if order.discount > 0 %}
+                <div class="d-flex justify-content-between text-success"><span>Discount</span><span>− Rs. {{ order.discount|floatformat:2 }}</span></div>
+                {% endif %}
+                <hr class="my-2">
+                <div class="d-flex justify-content-between fw-bold"><span>Grand Total</span><span class="text-success">Rs. {{ order.grand_total|floatformat:2 }}</span></div>
+            </div>
+        </div>
+        <a href="{% url 'accounts:order_history' %}" class="btn btn-link text-success mt-3">&larr; Back to order history</a>
+    </div>
+</section>
+{% endblock %}

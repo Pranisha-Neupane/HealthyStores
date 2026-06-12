@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <div class="food-img rounded-4 shadow" style="height:380px; font-size:8rem;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="rounded-4">
+                    {% else %}
+                    <span>{{ product.emoji }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <span class="section-label">{{ product.category.name }}</span>
+                <h1 class="mb-3">{{ product.name }}</h1>
+                <p class="text-muted">{{ product.description }}</p>
+
+                {% if product.ingredient_list %}
+                <h6 class="mt-4">Ingredients</h6>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% for ing in product.ingredient_list %}
+                    <span class="ingredient-chip fs-6">{{ ing }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-2 mb-4">
+                    {% if product.protein %}<span class="nutri-pill fs-6">💪 Protein {{ product.protein }}</span>{% endif %}
+                    {% if product.fiber %}<span class="nutri-pill fs-6">🌾 Fiber {{ product.fiber }}</span>{% endif %}
+                </div>
+
+                <div class="d-flex align-items-center gap-4">
+                    <span class="price-tag fs-2">Rs. {{ product.price|floatformat:0 }}</span>
+                    <form method="post" action="{% url 'cart:add' product.id %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="number" name="quantity" value="1" min="1" max="20" class="form-control" style="width:80px">
+                        <button class="btn btn-order btn-lg" type="submit"><i class="bi bi-cart-plus me-1"></i>Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if related %}
+        <hr class="my-5">
+        <h4 class="mb-4">You may also like</h4>
+        <div class="row g-4">
+            {% for product in related %}
+            <div class="col-md-6 col-lg-3">{% include 'products/_card.html' %}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

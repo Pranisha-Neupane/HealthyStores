@@ -1,0 +1,44 @@
+{# Reusable product card — expects `product` in context #}
+<div class="card food-card">
+    <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+        <div class="food-img">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <span>{{ product.emoji }}</span>
+            {% endif %}
+        </div>
+    </a>
+    <div class="card-body d-flex flex-column">
+        <h5 class="card-title fs-6 mb-1">
+            <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.name }}</a>
+        </h5>
+        {% if product.description %}
+        <p class="card-text small text-muted mb-2">{{ product.description|truncatechars:80 }}</p>
+        {% endif %}
+
+        {# Ingredient chips #}
+        {% if product.ingredient_list %}
+        <div class="d-flex flex-wrap gap-1 mb-2">
+            {% for ing in product.ingredient_list|slice:":4" %}
+            <span class="ingredient-chip">{{ ing }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Nutrition pills #}
+        <div class="d-flex gap-2 mb-3">
+            {% if product.protein %}<span class="nutri-pill">💪 Protein {{ product.protein }}</span>{% endif %}
+            {% if product.fiber %}<span class="nutri-pill">🌾 Fiber {{ product.fiber }}</span>{% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-auto">
+            <span class="price-tag">Rs. {{ product.price|floatformat:0 }}</span>
+            <form method="post" action="{% url 'cart:add' product.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-order btn-sm" type="submit"><i class="bi bi-cart-plus me-1"></i>Add to Cart</button>
+            </form>
+        </div>
+    </div>
+</div>

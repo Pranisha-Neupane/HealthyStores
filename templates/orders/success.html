@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Order Placed{% endblock %}
+{% block content %}
+<section class="section-pad">
+    <div class="container" style="max-width:680px">
+        <div class="card food-card p-5 text-center">
+            <div style="font-size:4.5rem">✅</div>
+            <h2 class="mt-2">Order Placed Successfully!</h2>
+            <p class="text-muted">Order <strong>#{{ order.id }}</strong> · {{ order.created_at|date:"M d, Y · g:i A" }}</p>
+
+            {% if loyalty_code %}
+            <!-- Loyalty reward celebration -->
+            <div class="alert alert-success mt-3">
+                <h5 class="mb-1">🎉 Congratulations! You've earned a loyalty discount.</h5>
+                <p class="mb-1">This was your {{ order.user.profile.total_orders }}th order — here's <strong>15% off</strong> your next one:</p>
+                <div class="fs-4 fw-bold border border-success border-2 border-dashed rounded-3 py-2 my-2 bg-white">{{ loyalty_code }}</div>
+                <small class="text-muted">Saved to your profile — apply it at checkout anytime.</small>
+            </div>
+            {% endif %}
+
+            <div class="text-start bg-light rounded-3 p-3 my-3">
+                {% for item in order.items.all %}
+                <div class="d-flex justify-content-between small mb-1">
+                    <span>{{ item.quantity }} × {{ item.product_name }}</span>
+                    <span>Rs. {{ item.total|floatformat:0 }}</span>
+                </div>
+                {% endfor %}
+                <hr class="my-2">
+                <div class="d-flex justify-content-between fw-bold"><span>Paid via {{ order.get_payment_method_display }}</span><span>Rs. {{ order.grand_total|floatformat:2 }}</span></div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'accounts:order_history' %}" class="btn btn-outline-success rounded-pill px-4">View Orders</a>
+                <a href="{% url 'products:menu' %}" class="btn btn-order px-4">Order More</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
